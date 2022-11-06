@@ -11,7 +11,8 @@
 #define closesocket close
 #endif
 
-#define PROTOPORT 27015
+#define BUFFER_SIZE 512
+#define PROTOPORT 30000
 #define SERVER_IP "192.168.178.69"
 #define QUEUE_LEN 4
 
@@ -22,6 +23,7 @@
 
 // methods
 void serverSocket();
+void print(char* message);
 
 #define NO_ERROR 0
 void clearwinsock() {
@@ -35,11 +37,11 @@ int main(void) {
 
 #if defined WIN32
 	// initialize Win sock
-
+	print("WSAStartup\n");
 	WSADATA wsa_data;
 	int result = WSAStartup(MAKEWORD(2,2), &wsa_data);
 	if(result != NO_ERROR) {
-		printf("Error at WSAStartup()\n");
+		print("Error at WSAStartup()\n");
 		return 0;
 	}
 #endif
@@ -47,19 +49,19 @@ int main(void) {
 
 	serverSocket();
 
-	puts("\n|--------------------------------|\nEnd of server execution");
+	printf("|--------------------------------|\nEnd of server execution\n");
 	return EXIT_SUCCESS;
 }
 
 
 
 void serverSocket() {
-	puts("Start server");
+	printf("Start server");
 
 	// init server socket
 	int server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(server_socket < 0) {
-		printf("Unable to initialize the server socket\n");
+		print("Unable to initialize the server socket\n");
 		closesocket(server_socket);
 		clearwinsock();
 	}
@@ -71,7 +73,7 @@ void serverSocket() {
 	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
 	int bind_res = bind(server_socket, (struct sockaddr*) &server_addr, sizeof(server_addr));
 	if(bind_res < 0) {
-		printf("Unable to bind the socket\n");
+		print("Unable to bind the socket\n");
 		closesocket(server_socket);
 		clearwinsock();
 	}
@@ -79,7 +81,7 @@ void serverSocket() {
 	// set socket to listen
 	int listen_res = listen(server_socket, QUEUE_LEN);
 	if(listen_res < 0) {
-		printf("Unable to listen the socket\n");
+		print("Unable to listen the socket\n");
 		closesocket(server_socket);
 		clearwinsock();
 	}
@@ -89,20 +91,37 @@ void serverSocket() {
 	int client_socket;
 	int client_address_len;
 
-	printf("Waiting for a new connection");
+	print("Waiting for a new connection...\n");
 	while(1){
 
 		client_address_len = sizeof(client_address);
 		client_socket = accept(server_socket, (struct sockaddr*) &client_address, &client_address_len);
 
 		if(client_socket < 0) {
-			printf("Unable to accept the client\n");
+			print("Unable to accept the client\n");
 			closesocket(server_socket);
 			clearwinsock();
 		}
 
-		printf("client connection received\n");
+		printf("client connection received from: %s\n", inet_ntoa(client_address.sin_addr));
+		fflush(stdout);
+
+		char received_msg[BUFFER_SIZE] = "";
+		int received_code = recv(client_socket, received_msg, BUFFER_SIZE - 1, 0);
+
+		if(received_code < 0) {
+			print("Error on receive message from client\n");
+			printf("error code: %d\n", received_code);
+			fflush(stdout);
+		}
+
+		printf("Received message: %s\n", received_msg);
 	}
+}
+
+void print(char* message) {
+	printf(message);
+	fflush(stdout);
 }
 
 

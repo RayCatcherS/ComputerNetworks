@@ -15,8 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 512
-#define PROTOPORT 27015
+#define PROTOPORT 30000
 #define SERVER_IP "192.168.178.69"
 
 
@@ -30,7 +29,7 @@ void clearwinsock() {
 
 // methods
 void clientSocket();
-
+void print(char* message);
 
 int main(void) {
 
@@ -39,7 +38,7 @@ int main(void) {
 	WSADATA wsa_data;
 	int result = WSAStartup(MAKEWORD(2,2), &wsa_data);
 	if(result != NO_ERROR) {
-		printf("Error at WSAStartup()\n");
+		print("Error at WSAStartup()\n");
 		return 0;
 	}
 #endif
@@ -48,6 +47,7 @@ int main(void) {
 	clientSocket();
 
 	puts("\n|--------------------------------|\nEnd of client execution");
+	system("pause");
 	return EXIT_SUCCESS;
 }
 
@@ -58,8 +58,7 @@ void clientSocket() {
 	// client socket
 	c_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(c_socket < 0) {
-		printf("socket: %d\n", c_socket);
-		printf("Unable to initialize a new socket\n");
+		print("Unable to initialize a new socket\n");
 		closesocket(c_socket);
 		clearwinsock();
 	}
@@ -76,7 +75,7 @@ void clientSocket() {
 	int connection_result = connect(c_socket, (struct sockaddr*) &server_soc_addr, sizeof(server_soc_addr));
 	if(connection_result < 0) {
 
-		printf("Unable to connect to server\n");
+		print("Unable to connect to server\n");
 		closesocket(c_socket);
 		clearwinsock();
 	}
@@ -90,7 +89,7 @@ void clientSocket() {
 
 	int send_result = send(c_socket, input_string, input_len, 0);
 	if(send_result < 0) {
-		printf("Unable to send data to server\n");
+		print("Unable to send data to server\n");
 		closesocket(c_socket);
 		clearwinsock();
 	}
@@ -98,4 +97,9 @@ void clientSocket() {
 	// end - close socket
 	closesocket(c_socket);
 	clearwinsock();
+}
+
+void print(char* message) {
+	printf(message);
+	fflush(stdout);
 }
