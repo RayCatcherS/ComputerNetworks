@@ -51,3 +51,15 @@ Module.symvers
 Mkfile.old
 dkms.conf
 /.metadata/
+echo_client_TCP/.cproject
+echo_server_TCP/.cproject
+echo_server_TCP/.cproject
+echo_server_TCP/.DS_Store
+echo_server_TCP/.settings/language.settings.xml
+echo_client_TCP/.settings/org.eclipse.cdt.core.prefs
+echo_client_TCP/.settings/org.eclipse.cdt.managedbuilder.core.prefs
+echo_client_TCP/.settings/language.settings.xml
+echo_server_TCP/.cproject
+echo_server_TCP/.settings/language.settings.xml
+*.xml
+echo_client_TCP/.cproject

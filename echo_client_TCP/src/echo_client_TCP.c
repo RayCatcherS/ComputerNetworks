@@ -44,15 +44,16 @@ int main(void) {
 	}
 #endif
 
-
+das
 	clientSocket();
 
-	puts("\n|--------------------------------|\nEnd of client execution"); /* prints !!!Hello World!!! */
+	puts("\n|--------------------------------|\nEnd of client execution");
 	return EXIT_SUCCESS;
 }
 
 //
 void clientSocket() {
+
 	int c_socket;
 	// client socket
 	c_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
