@@ -63,3 +63,4 @@ echo_server_TCP/.cproject
 echo_server_TCP/.settings/language.settings.xml
 *.xml
 echo_client_TCP/.cproject
+echo_server_TCP/.settings/language.settings.xml
