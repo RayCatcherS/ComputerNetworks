@@ -44,7 +44,7 @@ int main(void) {
 	}
 #endif
 
-das
+
 	clientSocket();
 
 	puts("\n|--------------------------------|\nEnd of client execution");
