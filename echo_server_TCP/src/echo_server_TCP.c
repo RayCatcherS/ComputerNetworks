@@ -12,7 +12,8 @@
 #endif
 
 #define BUFFER_SIZE 512
-#define PROTOPORT 30000
+#define SERVER_WELCOME_PORT 30000
+#define SERVER_REPLY_SERVICE_PORT 30001
 #define SERVER_IP "192.168.178.69"
 #define QUEUE_LEN 4
 
@@ -49,14 +50,14 @@ int main(void) {
 
 	serverSocket();
 
-	printf("|--------------------------------|\nEnd of server execution\n");
+	print("|--------------------------------|\nEnd of server execution\n");
 	return EXIT_SUCCESS;
 }
 
 
 
 void serverSocket() {
-	printf("Start server");
+	printf("Start server\n");
 
 	// init server socket
 	int server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -69,7 +70,7 @@ void serverSocket() {
 	// bind socket
 	struct  sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(PROTOPORT);
+	server_addr.sin_port = htons(SERVER_WELCOME_PORT);
 	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
 	int bind_res = bind(server_socket, (struct sockaddr*) &server_addr, sizeof(server_addr));
 	if(bind_res < 0) {
@@ -91,9 +92,9 @@ void serverSocket() {
 	int client_socket;
 	int client_address_len;
 
-	print("Waiting for a new connection...\n");
-	while(1){
 
+	while(1){
+		print("Waiting for a new connection...\n");
 		client_address_len = sizeof(client_address);
 		client_socket = accept(server_socket, (struct sockaddr*) &client_address, &client_address_len);
 
@@ -101,9 +102,10 @@ void serverSocket() {
 			print("Unable to accept the client\n");
 			closesocket(server_socket);
 			clearwinsock();
+			return;
 		}
 
-		printf("client connection received from: %s\n", inet_ntoa(client_address.sin_addr));
+		printf("client connection received from: %s:%d\n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
 		fflush(stdout);
 
 		char received_msg[BUFFER_SIZE] = "";
@@ -113,9 +115,17 @@ void serverSocket() {
 			print("Error on receive message from client\n");
 			printf("error code: %d\n", received_code);
 			fflush(stdout);
+			return;
 		}
 
-		printf("Received message: %s\n", received_msg);
+
+
+		printf("Echoing received message: %s\n", received_msg);
+		// reply to client
+
+
+		send(client_socket, received_msg, strlen(received_msg), 0);
+		print("Echo message sent\n");
 	}
 }
 

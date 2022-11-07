@@ -15,7 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PROTOPORT 30000
+#define BUFFER_SIZE 512
+#define SERVER_WELCOME_PORT 30000
 #define SERVER_IP "192.168.178.69"
 
 
@@ -43,10 +44,10 @@ int main(void) {
 	}
 #endif
 
-
+	print("Starting client\n");
 	clientSocket();
 
-	puts("\n|--------------------------------|\nEnd of client execution");
+	print("|--------------------------------|\nEnd of client execution\n");
 	system("pause");
 	return EXIT_SUCCESS;
 }
@@ -61,14 +62,14 @@ void clientSocket() {
 		print("Unable to initialize a new socket\n");
 		closesocket(c_socket);
 		clearwinsock();
+		return;
 	}
 
 
 	// server addr init
 	struct sockaddr_in server_soc_addr;
-	memset(&server_soc_addr, 0, sizeof(server_soc_addr));
 	server_soc_addr.sin_family = AF_INET;
-	server_soc_addr.sin_port = htons(PROTOPORT);
+	server_soc_addr.sin_port = htons(SERVER_WELCOME_PORT);
 	server_soc_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
 
 	// server stream connection
@@ -78,21 +79,40 @@ void clientSocket() {
 		print("Unable to connect to server\n");
 		closesocket(c_socket);
 		clearwinsock();
+		return;
 	}
 
 
 
 	// send to server the message
 	char* input_string = "prova";
-	int input_len = strlen(input_string);
 
 
-	int send_result = send(c_socket, input_string, input_len, 0);
+	int send_result = send(c_socket, input_string, strlen(input_string), 0);
 	if(send_result < 0) {
 		print("Unable to send data to server\n");
 		closesocket(c_socket);
 		clearwinsock();
+		return;
 	}
+	print("Message to server sent\n");
+
+	// wait echo server
+	char received_msg[BUFFER_SIZE] = "";
+	int received_code = recv(c_socket, received_msg, BUFFER_SIZE - 1, 0);
+
+	if(received_code < 0) {
+		print("Error on receive echo message from server\n");
+		printf("error code: %d\n", received_code);
+		fflush(stdout);
+		return;
+	}
+
+
+
+	printf("Echoing received message: %s\n", received_msg);
+
+
 
 	// end - close socket
 	closesocket(c_socket);
