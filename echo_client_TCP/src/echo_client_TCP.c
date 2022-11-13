@@ -65,6 +65,19 @@ void clientSocket() {
 		return;
 	}
 
+	// get host name for the request
+	struct hostent* hostip = gethostbyname("localhost");
+
+	if(hostip == NULL) {
+		print("Error during the dns resolving");
+		return;
+	}
+
+	struct in_addr* ina = (struct in_addr*) hostip->h_addr_list[0];
+	char* result = inet_ntoa(*ina);
+
+
+
 
 	// server addr init
 	struct sockaddr_in server_soc_addr;
