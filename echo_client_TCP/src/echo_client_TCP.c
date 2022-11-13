@@ -74,7 +74,6 @@ void clientSocket() {
 	}
 
 	struct in_addr* ina = (struct in_addr*) hostip->h_addr_list[0];
-	char* result = inet_ntoa(*ina);
 
 
 
@@ -83,7 +82,7 @@ void clientSocket() {
 	struct sockaddr_in server_soc_addr;
 	server_soc_addr.sin_family = AF_INET;
 	server_soc_addr.sin_port = htons(SERVER_WELCOME_PORT);
-	server_soc_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
+	server_soc_addr.sin_addr.s_addr = ina->s_addr;
 
 	// server stream connection
 	int connection_result = connect(c_socket, (struct sockaddr*) &server_soc_addr, sizeof(server_soc_addr));
